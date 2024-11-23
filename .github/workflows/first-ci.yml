@@ -1,24 +1,45 @@
+name: Multi-Task Workflow
+
 on:
   push:
     branches:
       - main
 
-# Define jobs and their steps
 jobs:
-  basic-checkout:
+  # Job A - Independent task
+  job-a:
     runs-on: ubuntu-latest
     steps:
-      # Step 1: Checkout the repository
       - name: Checkout repository
         uses: actions/checkout@v4
       
-      # Step 2: List repository contents
-      - name: List files
-        run: ls -la
-      
-      # Step 3: Display system information
-      - name: Show system info
+      - name: Task A - List files
         run: |
-          echo "Repository: $GITHUB_REPOSITORY"
-          echo "Operating System: $(uname -a)"
-          echo "Current Directory: $(pwd)"
+          echo "Running Task A"
+          ls -la
+
+  # Job B - Depends on Job A
+  job-b:
+    runs-on: ubuntu-latest
+    needs: job-a  # Wait for job-a to complete
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Task B - Display system info
+        run: |
+          echo "Running Task B"
+          uname -a
+
+  # Job C - Depends on Job B
+  job-c:
+    runs-on: ubuntu-latest
+    needs: job-b  # Wait for job-b to complete
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Task C - Show current directory
+        run: |
+          echo "Running Task C"
+          pwd
